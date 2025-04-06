@@ -1,0 +1,28 @@
+/* Estilos específicos para la aplicación */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilo para páginas */
+.page-container {
+  padding: 20px 0;
+}
+
+/* Estilos para cards */
+.card {
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos específicos para formularios */
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Estilos para tablas responsivas */
+.table-container {
+  overflow-x: auto;
+}
