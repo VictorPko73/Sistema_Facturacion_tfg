@@ -89,7 +89,7 @@ function ProductosList() {
                                     <td>{producto.id}</td>
                                     <td>{producto.nombre}</td>
                                     <td>{producto.descripcion}</td>
-                                    <td>${producto.precio.toFixed(2)}</td>
+                                    <td>{producto.precio.toFixed(2)} €</td>
                                     <td>{producto.stock}</td>
                                     <td> {/* Añadir esta celda con los botones */}
                                         <div className="btn-group" role="group">

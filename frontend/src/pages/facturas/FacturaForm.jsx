@@ -280,8 +280,8 @@ function FacturaForm() {
                                             <tr key={index}>
                                                 <td>{detalle.producto_nombre}</td>
                                                 <td>{detalle.cantidad}</td>
-                                                <td>${detalle.precio_unitario.toFixed(2)}</td>
-                                                <td>${detalle.subtotal.toFixed(2)}</td>
+                                                <td>{detalle.precio_unitario.toFixed(2)} €</td>
+                                                <td>{detalle.subtotal.toFixed(2)} €</td>
                                                 <td>
                                                     <button
                                                         type="button"
@@ -297,7 +297,7 @@ function FacturaForm() {
                                     <tfoot>
                                         <tr>
                                             <th colSpan="3" className="text-end">Total:</th>
-                                            <th>${factura.total.toFixed(2)}</th>
+                                            <th>{factura.total.toFixed(2)} €</th>
                                             <th></th>
                                         </tr>
                                     </tfoot>

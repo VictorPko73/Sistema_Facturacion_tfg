@@ -211,17 +211,47 @@ def get_producto(id):
 # Rutas para el manejo de Facturas
 #------------------------------------------------------
 
+##------------------ MODIFICACION PARA ELIMINAR FACTURAS----------------
+
 @app.route('/api/facturas', methods=['GET'])
 def get_facturas():
     """
-    Obtiene la lista de todas las facturas registradas.
+    Obtiene todas las facturas con información básica.
 
     Método: GET
     Ruta: /api/facturas
-    Respuesta: Lista de objetos factura (incluyendo sus detalles) en formato JSON
+    Respuesta: Lista de facturas en formato JSON
     """
     facturas = Factura.query.all()
-    return jsonify([factura.to_dict() for factura in facturas])
+    result = []
+
+    for factura in facturas:
+        # Obtener el nombre del cliente
+        cliente = Cliente.query.get(factura.cliente_id)
+        cliente_nombre = cliente.nombre if cliente else "Cliente desconocido"
+
+        # Calcular el total de la factura
+        total = sum(detalle.subtotal for detalle in factura.detalles)
+
+        # Crear diccionario con datos de la factura
+        factura_dict = factura.to_dict()
+        factura_dict['cliente_nombre'] = cliente_nombre
+        factura_dict['total'] = total
+
+        # Añadir detalles básicos de los productos
+        detalles = []
+        for detalle in factura.detalles:
+            producto = Producto.query.get(detalle.producto_id)
+            producto_nombre = producto.nombre if producto else "Producto desconocido"
+
+            detalle_dict = detalle.to_dict()
+            detalle_dict['producto_nombre'] = producto_nombre
+            detalles.append(detalle_dict)
+
+        factura_dict['detalles'] = detalles
+        result.append(factura_dict)
+
+    return jsonify(result)
 
 @app.route('/api/facturas', methods=['POST'])
 def create_factura():
@@ -309,14 +339,38 @@ def delete_factura(id):
 @app.route('/api/facturas/<int:id>', methods=['GET'])
 def get_factura(id):
     """
-    Obtiene una factura específica por su ID.
+    Obtiene una factura específica con todos sus detalles.
 
     Método: GET
     Ruta: /api/facturas/<id>
-    Respuesta: Datos de la factura (incluyendo sus detalles) en formato JSON o error 404 si no existe
+    Respuesta: Datos de la factura en formato JSON
     """
     factura = Factura.query.get_or_404(id)
-    return jsonify(factura.to_dict())
+
+    # Obtener el nombre del cliente
+    cliente = Cliente.query.get(factura.cliente_id)
+    cliente_nombre = cliente.nombre if cliente else "Cliente desconocido"
+
+    # Calcular el total de la factura
+    total = sum(detalle.subtotal for detalle in factura.detalles)
+
+    # Crear diccionario con datos de la factura
+    factura_dict = factura.to_dict()
+    factura_dict['cliente_nombre'] = cliente_nombre
+    factura_dict['total'] = total
+
+    # Añadir detalles completos de los productos
+    detalles = []
+    for detalle in factura.detalles:
+        producto = Producto.query.get(detalle.producto_id)
+        producto_nombre = producto.nombre if producto else "Producto desconocido"
+
+        detalle_dict = detalle.to_dict()
+        detalle_dict['producto_nombre'] = producto_nombre
+        detalles.append(detalle_dict)
+
+    factura_dict['detalles'] = detalles
+    return jsonify(factura_dict)
 
 # Punto de entrada principal
 if __name__ == '__main__':

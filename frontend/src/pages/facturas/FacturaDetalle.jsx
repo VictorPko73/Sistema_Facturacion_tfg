@@ -1,24 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { descargarFacturaPDF, abrirFacturaPDF } from '../../services/pdfService';
 
-// Componente para mostrar el detalle de una factura
 function FacturaDetalle() {
-    // Obtener el ID de la factura de la URL
     const { id } = useParams();
-
-    // Estado para almacenar los datos de la factura
     const [factura, setFactura] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // Cargar datos de la factura al montar el componente
     useEffect(() => {
         const fetchFactura = async () => {
             try {
-                // Realizar petición GET a la API
                 const response = await axios.get(`http://localhost:5001/api/facturas/${id}`);
-                // Actualizar estado con los datos recibidos
                 setFactura(response.data);
                 setLoading(false);
             } catch (error) {
@@ -31,32 +25,62 @@ function FacturaDetalle() {
         fetchFactura();
     }, [id]);
 
-    // Mostrar spinner mientras se cargan los datos
+    // Manejadores para los botones de PDF
+    const handleDescargarPDF = () => {
+        try {
+            descargarFacturaPDF(factura);
+        } catch (error) {
+            console.error('Error al descargar PDF:', error);
+            alert('Error al descargar el PDF');
+        }
+    };
+
+    const handleVerPDF = () => {
+        try {
+            abrirFacturaPDF(factura);
+        } catch (error) {
+            console.error('Error al abrir PDF:', error);
+            alert('Error al abrir el PDF');
+        }
+    };
+
     if (loading) {
         return <div className="text-center mt-5"><div className="spinner-border"></div></div>;
     }
 
-    // Mostrar mensaje de error si hay algún problema
     if (error) {
         return <div className="alert alert-danger">{error}</div>;
     }
 
-    // Mostrar mensaje si no se encuentra la factura
     if (!factura) {
         return <div className="alert alert-warning">Factura no encontrada.</div>;
     }
 
     return (
         <div>
-            {/* Encabezado con título y botón para volver */}
+            {/* Encabezado con título y botones */}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>Factura #{factura.id}</h2>
-                <Link to="/facturas" className="btn btn-secondary">
-                    Volver a Facturas
-                </Link>
+                <div className="d-flex gap-2">
+                    <Link to="/facturas" className="btn btn-secondary">
+                        Volver a Facturas
+                    </Link>
+                    <button
+                        className="btn btn-primary"
+                        onClick={handleDescargarPDF}
+                    >
+                        Descargar PDF
+                    </button>
+                    <button
+                        className="btn btn-info"
+                        onClick={handleVerPDF}
+                    >
+                        Ver PDF
+                    </button>
+                </div>
             </div>
 
-            {/* Tarjeta con información general */}
+            {/* Resto del componente igual que antes */}
             <div className="card mb-4">
                 <div className="card-header">
                     <h5 className="mb-0">Información General</h5>
@@ -74,7 +98,6 @@ function FacturaDetalle() {
                 </div>
             </div>
 
-            {/* Tarjeta con detalle de productos */}
             <div className="card">
                 <div className="card-header">
                     <h5 className="mb-0">Detalle de Productos</h5>
@@ -95,15 +118,15 @@ function FacturaDetalle() {
                                     <tr key={detalle.id}>
                                         <td>{detalle.producto_nombre}</td>
                                         <td>{detalle.cantidad}</td>
-                                        <td>${detalle.precio_unitario.toFixed(2)}</td>
-                                        <td>${detalle.subtotal.toFixed(2)}</td>
+                                        <td>{detalle.precio_unitario.toFixed(2)} €</td>
+                                        <td>{detalle.subtotal.toFixed(2)} €</td>
                                     </tr>
                                 ))}
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <th colSpan="3" className="text-end">Total:</th>
-                                    <th>${factura.total.toFixed(2)}</th>
+                                    <th>{factura.total.toFixed(2)} €</th>
                                 </tr>
                             </tfoot>
                         </table>
